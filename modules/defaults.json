@@ -1,0 +1,12 @@
+{
+  "ffmpegPath": "ffmpeg",
+  "ffprobePath": "ffprobe",
+  "json": true,
+  "proxy": false,
+  "configOptions": [
+    "ffmpegPath",
+    "ffprobePath",
+    "json",
+    "proxy"
+  ]
+}
