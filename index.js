@@ -1,9 +1,9 @@
 global.__basedir = __dirname;
-var shootprocessor = require('./modules/shootprocessor');
+var simplyRename = require('./modules/simply-rename');
 
 const rename = async function (settings) {
   console.log("starting rename");
-  await shootprocessor.rename(settings);
+  await simplyRename(settings);
 }
 
 module.exports.rename = rename;

@@ -13,6 +13,7 @@ cliTools.printTitle(['simple\nrename']);
 if (yargs.config) {
   cliTools.setConfig(yargs, defaults);
 } else {
+  yargs.shootFolder = cliTools.getTarget(yargs, "shootFolder");
   var jobSettings = cliTools.mergeSettings(yargs, defaults);
   simpleRenameMachine.rename(jobSettings)
     .then(()=>console.log("done."));

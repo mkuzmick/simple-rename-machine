@@ -3,6 +3,7 @@
   "ffprobePath": "ffprobe",
   "json": true,
   "proxy": false,
+  "shootFolder": false,
   "configOptions": [
     "ffmpegPath",
     "ffprobePath",

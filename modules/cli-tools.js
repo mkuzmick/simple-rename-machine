@@ -39,8 +39,9 @@ exports.printJson = function(obj){
 }
 
 exports.getTarget = function(args, propName){
+  console.log("getting target");
   // figure out whether to use prop or first element of `_` array
-  return (args[propName]===true ? args._[0] : args[propName]);
+  return (args[propName]!==true ? args._[0] : args[propName]);
 }
 
 // TODO: a lame thing left over here.  Let's just loop through all

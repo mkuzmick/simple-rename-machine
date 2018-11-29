@@ -1,13 +1,7 @@
-const fs = require("fs");
-const path = require("path");
-const ffprobetools = require("./ffprobetools");
-// var shootprocessor = require("./shootprocessor");
-var dateFormat = require('dateformat');
-
 function Clip(folderPath, camFolder, file, theIndex){
   var now = new Date();
-  this.thelocalworkflowIngestTime = (dateFormat(now, "UTC:yyyy-mm-dd HH-MM-ss"));
-  this.thelocalworkflowFcpxmlTime =  dateFormat(now, "yyyy-mm-dd HH:MM:ss o");
+  this.tlwIngestTime = (dateFormat(now, "UTC:yyyy-mm-dd HH-MM-ss"));
+  this.tlwFcpxmlTime =  dateFormat(now, "yyyy-mm-dd HH:MM:ss o");
   this.oldBasenameExt = file;
   this.oldPath = path.join(folderPath, camFolder, file);
   this.cameraFolder = camFolder;
@@ -16,8 +10,6 @@ function Clip(folderPath, camFolder, file, theIndex){
   this.ffprobeOutput=ffprobetools.ffprobeSync(this.oldPath);
   // introduce a temp variable to hold ffprobeObject
   var theFfprobeObject = JSON.parse(this.ffprobeOutput);
-
-
   // this.ffprobeObject=JSON.parse(this.ffprobeOutput);
   this.ext = path.extname(file);
   this.newBasename = (this.shootId + "_" + camFolder + "_" + this.counter)
@@ -120,123 +112,4 @@ function Clip(folderPath, camFolder, file, theIndex){
   // ultimately loop through streams and see if one is audio first, which will determine if we actually have audio.
 };
 
-function Still(folderPath, camFolder, file, theIndex){
-  var now = new Date();
-  this.thelocalworkflowIngestTime = (dateFormat(now, "UTC:yyyy-mm-dd HH-MM-ss"));
-  this.thelocalworkflowFcpxmlTime =  dateFormat(now, "yyyy-mm-dd HH:MM:ss o");
-  this.oldBasenameExt = file;
-  this.oldPath = path.join(folderPath, camFolder, file);
-  this.cameraFolder = camFolder;
-  this.shootId=path.basename(folderPath);
-  this.counter = ("000" + (theIndex + 1)).slice(-3);
-  this.ext = path.extname(file);
-  this.newBasename = (this.shootId + "_" + camFolder + "_" + this.counter)
-  this.newBasenameExt = (this.newBasename + this.ext)
-  this.newPath = path.join(folderPath, camFolder, this.newBasenameExt);
-};
-
-function Shoot(shootPath){
-  this.shootPath = shootPath;
-  this.people = [];
-  this.cameraArray = [];
-  this.clipArray = [];
-  this.shootId = path.basename(shootPath);
-  this.shootIdDate = this.shootId.split('_')[0];
-  this.shootCounter = this.shootId.split('_')[1];
-  this.projectId = this.shootId.split('_')[2];
-  this.subId = this.shootId.split('_')[3];
-  this.fcpxml = {};
-  this.fcpxml.motionEffectA = {effect: {_attr:{id:"empty", name:"2.5-cam-A-2018", uid:"~/Effects.localized/ll-2018/multicam/2.5-cam-A-2018/2.5-cam-A-2018.moef", src:("file://" + process.env.ROOT_DIR + "/tools/motion_templates/ll-2018/multicam/2.5-cam-A-2018/2.5-cam-A-2018.moef")}}};
-  this.fcpxml.motionEffectB = {effect: {_attr:{id:"empty", name:"2.5-cam-B-2018", uid:"~/Effects.localized/ll-2018/multicam/2.5-cam-B-2018/2.5-cam-B-2018.moef", src:("file://" + process.env.ROOT_DIR + "/tools/motion_templates/ll-2018/multicam/2.5-cam-B-2018/2.5-cam-B-2018.moef")}}};
-  this.fcpxml.motionEffectC = {effect: {_attr:{id:"empty", name:"2.5-cam-C-2018", uid:"~/Effects.localized/ll-2018/multicam/2.5-cam-C-2018/2.5-cam-C-2018.moef", src:("file://" + process.env.ROOT_DIR + "/tools/motion_templates/ll-2018/multicam/1-cam-C-2018/1-cam-C-2018.moef")}}};
-
-};
-
-var workflowTools = {
-  tcToFcpxTs: function timeCodeToFcpxmlFormat(timecode){
-    var tempTc = ("willBeAFunctionOf " + timecode);
-    var theHours = parseInt(timecode.split(':')[0]);
-    var theMinutes = parseInt(timecode.split(':')[1]);
-    var theSeconds = parseInt(timecode.split(':')[2]);
-    var theFrames = parseInt(timecode.split(':')[3]);
-    // console.log("theHours=" + theHours);
-    // console.log("theMinutes=" + theMinutes);
-    // console.log("theSeconds=" + theSeconds);
-    // console.log("theFrames=" + theFrames);
-    var theTotalFrames = (theFrames)+(24*(theSeconds+(60*(theMinutes+(60*theHours)))));
-    // console.log(theTotalFrames);
-    // var theFcpxFormat = ((theTotalFrames*1001) + "/24000s");
-    var theFcpxFormat = (theTotalFrames*1001);
-    // console.log(theFcpxFormat);
-    return theFcpxFormat;
-  },
-  idTcToDate: function dateFromIdTc(shootId, timecode) {
-    // console.log("working in dateFromId with " + shootId);
-    var regexTest = /^\d{8}/;
-    var dateRoot = shootId.slice(0,8);
-    if (regexTest.test(dateRoot)) {
-      var y = dateRoot.substr(0,4),
-          m = (dateRoot.substr(4,2) - 1),
-          d = dateRoot.substr(6,2);
-      var theHours = parseInt(timecode.split(':')[0]),
-          theMinutes = parseInt(timecode.split(':')[1]),
-          theSeconds = parseInt(timecode.split(':')[2]),
-          theFrames = parseInt(timecode.split(':')[3]);
-      var theTotalFrames = (theFrames)+(24*(theSeconds+(60*(theMinutes+(60*theHours)))));
-      var D = new Date(y,m,d, theHours, theMinutes, theSeconds);
-      // console.log(y,m,d, theHours, theMinutes, theSeconds);
-      // console.log("the date is " + D);
-      return D;
-    }
-    else {
-      // console.log(shootId + "'s dateRoot " + dateRoot + " is not a valid date string");
-    }
-  }
-
-};
-
-function timeCodeToFcpxmlFormat(timecode){
-  var tempTc = ("willBeAFunctionOf " + timecode);
-  var theHours = parseInt(timecode.split(':')[0]);
-  var theMinutes = parseInt(timecode.split(':')[1]);
-  var theSeconds = parseInt(timecode.split(':')[2]);
-  var theFrames = parseInt(timecode.split(':')[3]);
-  // console.log("theHours=" + theHours);
-  // console.log("theMinutes=" + theMinutes);
-  // console.log("theSeconds=" + theSeconds);
-  // console.log("theFrames=" + theFrames);
-  var theTotalFrames = (theFrames)+(24*(theSeconds+(60*(theMinutes+(60*theHours)))));
-  // console.log(theTotalFrames);
-  // var theFcpxFormat = ((theTotalFrames*1001) + "/24000s");
-  var theFcpxFormat = (theTotalFrames*1001);
-  // console.log(theFcpxFormat);
-  return theFcpxFormat;
-};
-
-function dateFromIdTc(shootId, timecode) {
-  // console.log("working in dateFromId with " + shootId);
-  var regexTest = /^\d{8}/;
-  var dateRoot = shootId.slice(0,8);
-  if (regexTest.test(dateRoot)) {
-    var y = dateRoot.substr(0,4),
-        m = (dateRoot.substr(4,2) - 1),
-        d = dateRoot.substr(6,2);
-    var theHours = parseInt(timecode.split(':')[0]),
-        theMinutes = parseInt(timecode.split(':')[1]),
-        theSeconds = parseInt(timecode.split(':')[2]),
-        theFrames = parseInt(timecode.split(':')[3]);
-    var theTotalFrames = (theFrames)+(24*(theSeconds+(60*(theMinutes+(60*theHours)))));
-    var D = new Date(y,m,d, theHours, theMinutes, theSeconds);
-    // console.log(y,m,d, theHours, theMinutes, theSeconds);
-    // console.log("the date is " + D);
-    return D;
-  }
-  else {
-    // console.log(shootId + "'s dateRoot " + dateRoot + " is not a valid date string");
-  }
-}
-
-module.exports.Clip = Clip;
-module.exports.Shoot = Shoot;
-module.exports.Still = Still;
-module.exports.tools = workflowTools;
+module.exports = Clip;
