@@ -15,23 +15,23 @@ function rename(settings) {
   var deviceArray = [];
   var l12Re =/L12/i;
   var stillsRe =/still/i;
-  console.log("grabbing new Shoot object for " + settings.shootFolder);
+  // console.log("grabbing new Shoot object for " + settings.shootFolder);
   var folders = fs.readdirSync(settings.shootFolder);
-  snapshot("shootFolder's folders", folders);
+  // snapshot("shootFolder's folders", folders);
   folders.forEach(folder => {
     var folderPath = path.join(settings.shootFolder, folder);
-    snapshot('folders foreach running with', folderPath);
+    // snapshot('folders foreach running with', folderPath);
     if (dotRe.test(folder) || hiddenRe.test(folder)) {
-      console.log(folderPath + " is not a folder we'll processs");
+      // console.log(folderPath + " is not a folder we'll processs");
       return;
     }
 // thisShoot.cameraArray.push(camFolder);
 //  check if it's a folder?
     else if (fs.statSync(folderPath).isDirectory()) {
-      console.log("pushing this folder into cameraArray: " + folderPath);
+      // console.log("pushing this folder into cameraArray: " + folderPath);
       theShoot.cameraArray.push(folder);
       if (l12Re.test(folder)) {
-        console.log(folderPath + " is for the L12");
+        // console.log(folderPath + " is for the L12");
         var newData = handleL12Folder(folderPath, theShoot.shootPath);
       } else if (stillsRe.test(folder)){
         var newData = handleStillsFolder(folderPath, folder, theShoot.shootId);
@@ -43,10 +43,10 @@ function rename(settings) {
   // var pathForJson = (theResult.shootPath + "/_notes/" + theResult.shootId + "_shootObject.json");
   })
   console.log("done");
-  snapshot('allFiles', allFiles);
+  // snapshot('allFiles', allFiles);
   logRenameOperations(allFiles, theShoot);
-  console.log(allFiles.length);
-  snapshot("theShoot", theShoot);
+  // console.log(allFiles.length);
+  // snapshot("theShoot", theShoot);
 }
 
 function handleL12Folder(folderPath, shootFolder) {
@@ -56,7 +56,6 @@ function handleL12Folder(folderPath, shootFolder) {
   fs.readdirSync(folderPath).forEach(function(file) {
     if (!dotRe.test(file)) {
       var ext = path.extname(file);
-      console.log("this clip will be a new L12 clip: " + file);
       var trackId = file.split("TRACK")[1];
       trackId = trackId.substring(0,2);
       trackFolder = path.join(shootFolder, ("L12Tr" + trackId));
@@ -82,7 +81,6 @@ function handleL12Folder(folderPath, shootFolder) {
   });
   var theFolderFilesNow = fs.readdirSync(folderPath);
   if (theFolderFilesNow < 1) {
-    console.log("directory now empty");
     try {
       fs.rmdirSync(folderPath);
     } catch (e) {
@@ -108,7 +106,6 @@ function handleCameraFolder(folderPath, cameraId, shootId) {
   var newFiles = [];
   fs.readdirSync(folderPath).forEach(function(file) {
     if (!dotRe.test(file)) {
-      // var thisClip = new Clip();
       var filenameCounter = ("000" + (numericalCounter)).slice(-3);
       var ext = path.extname(file);
       var cameraId = path.basename(folderPath);
@@ -117,7 +114,6 @@ function handleCameraFolder(folderPath, cameraId, shootId) {
         currentPath: path.join(folderPath, file),
         newPath: path.join(folderPath, newBasenameExt)
       });
-      console.log("this clip will be a new clip: " + file);
       fs.renameSync(thisClip.currentPath, thisClip.newPath);
       numericalCounter++;
       newFiles.push(thisClip);
@@ -132,7 +128,6 @@ function handleStillsFolder(folderPath, cameraId, shootId) {
   var newFiles = [];
   fs.readdirSync(folderPath).forEach(function(file) {
     if (!dotRe.test(file)) {
-      console.log("this still will be a new still: " + file);
       var filenameCounter = ("000" + (numericalCounter)).slice(-3);
       var ext = path.extname(file);
       var cameraId = path.basename(folderPath);
@@ -141,7 +136,6 @@ function handleStillsFolder(folderPath, cameraId, shootId) {
         currentPath: path.join(folderPath, file),
         newPath: path.join(folderPath, newBasenameExt)
       });
-      console.log("this clip will be a new clip: " + file);
       fs.renameSync(thisClip.currentPath, thisClip.newPath);
       numericalCounter++;
       newFiles.push(thisClip);
